@@ -1,5 +1,5 @@
 # compiler
-Compilers Course Lab @ IIT Palakkad.
+Compilers Lab @ IIT Palakkad.
 
 Compiler Project as a part of Language Translators Laboratory (CS3310)
 
