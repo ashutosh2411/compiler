@@ -21,6 +21,14 @@ whitespace=[\t\ ]+;
 
 {digit}+                 	=>		(Tokens.INT(valOf(Int.fromString yytext),yypos,yypos+size yytext));
 
+"<="			    		=>		(Tokens.LE(yypos,yypos+2));
+">="    					=>		(Tokens.GE(yypos,yypos+2));
+"=="			    		=>		(Tokens.EQ(yypos,yypos+2));
+"!="			    		=>		(Tokens.NE(yypos,yypos+2));
+">"							=>		(Tokens.GT(yypos,yypos+1));
+"<"							=>		(Tokens.LT(yypos,yypos+1));
+"="							=>		(Tokens.ASSIGN(yypos,yypos+1));
+
 "+"							=>		(Tokens.PLUS(yypos,yypos+1));
 "-"							=>		(Tokens.MINUS(yypos,yypos+1));
 "/"							=>		(Tokens.DIVIDE(yypos,yypos+1));
