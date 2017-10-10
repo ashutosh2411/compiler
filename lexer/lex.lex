@@ -16,6 +16,8 @@ digit =[0-9] ;
 whitespace=[\t\ ]+;
 
 %%
+\n 							=> (lineNum := !lineNum + 1; linePos := yypos::(!linePos); continue());
+{whitespace}  				=> (continue());
 
 {digit}+                 	=>		(Tokens.INT(valOf(Int.fromString yytext),yypos,yypos+size yytext));
 
