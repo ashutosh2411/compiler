@@ -1,6 +1,12 @@
 type pos = int
 type svalue = Tokens.svalue
 
+type ('a,'b) token = ('a,'b) Tokens.token
+type lexresult = (svalue, pos) token
+
+val lineNum = ErrorMsg.lineNum 
+val linePos = ErrorMsg.linePos 
+
 fun eof() = let val pos = hd(!linePos) in Tokens.EOF(pos,pos) end
 
 %%
@@ -10,6 +16,8 @@ digit =[0-9] ;
 whitespace=[\t\ ]+;
 
 %%
+
+{digit}+                 	=>		(Tokens.INT(valOf(Int.fromString yytext),yypos,yypos+size yytext));
 
 "+"							=>		(Tokens.PLUS(yypos,yypos+1));
 "-"							=>		(Tokens.MINUS(yypos,yypos+1));
