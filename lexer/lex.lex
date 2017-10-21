@@ -7,8 +7,8 @@ type lexresult = (svalue, pos) token
 
 val lineNum = ErrorMsg.lineNum 
 val linePos = ErrorMsg.linePos 
-fun err(p1,p2) = ErrorMsg.error p1 
 
+fun err(p1,p2) = ErrorMsg.error p1 
 fun eof() = let val pos = hd(!linePos) in Tokens.EOF(pos,pos) end
 
 %%
