@@ -38,9 +38,9 @@ struct
 	fun COMMA(i,j) = "COMMA   " ^ Int.toString(i)
 	fun PRINTF(i,j) = "PRINT   " ^ Int.toString(i)
 
-
+(*
 	fun STRING(s,i,j) = "STRING("^s^")     " ^ Int.toString(i)
-
+*)
 	fun INT(c,i,j) = "INT("^Int.toString(c)^")   " ^ Int.toString(i)
 	fun ID(s,i,j) = "ID("^s^")     " ^ Int.toString(i)
 	fun EOF(i,j) = "EOF   " ^ Int.toString(i)
