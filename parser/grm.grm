@@ -1,44 +1,57 @@
-
 %%
 
+%term
+    EOF 
+  | ID of string
+  | INT of int  
+  | COMMA | COLON | SEMICOLON | LPAREN | RPAREN   
+  | LBRACE | RBRACE  
+  | PLUS | MINUS | TIMES | DIVIDE | MOD | EQ | NEQ | LT | LE | GT | GE |EEQ
+
+%nonterm 
+			start
+		|	statements
+		|	statement
+		|	assignment_statement
+		|	exp
+
+
+(* Precedence Directives *)
+%right      ELSE                                      (* Binding - Loose *)
+%left       OR                                        (* | *)
+%left       AND                                       (* | *)
+%nonassoc   EQ NEQ LT LE GT GE                        (* | *)
+%left       PLUS MINUS                                (* \/ *)
+%left       TIMES DIVIDE  MOD                         (* Binding - Tight *)
+
+%pos int 
+%start start
 %eop EOF
-%verbose
-%pure
-%name Expr
+%noshift EOF
 
-%term CONST of int
-    | PLUS
-    | MINUS
-    | MUL
-    | EOF
-    | NEWLINE
-
-(* The nonterminals of the language *)
-%nonterm EXP     of Ast.Expr
-       | EXPS    of Ast.Expr list
-       | PROGRAM of Ast.Expr list
-
-(*
-
-Operator precedence and associativity. The %left says the operator is
-left associative and the precedence increase as you go down this list.
-
-*)
-
-%left PLUS MINUS  (* + and - are of same precedence *)
-%left MUL         (* higher than + and -            *)
-
-(* The type that captures position in the input *)
-
-%pos int
 
 %%
+(*grammer rules*)
 
-PROGRAM : EXPS                 ( EXPS )
-	| EXPS NEWLINE         ( EXPS )
-EXPS    : EXP NEWLINE EXPS     ( EXP :: EXPS         )
-	|                      ( []                  )
-EXP     : CONST                ( Ast.Const CONST     )
-        | EXP PLUS EXP         ( Ast.plus  EXP1 EXP2 )
-	| EXP MINUS EXP        ( Ast.minus EXP1 EXP2 )
-	| EXP MUL   EXP        ( Ast.mul   EXP1 EXP2 )
+statements 
+	: statement  						( statement )
+   	| statement statements			( Ast.statements_(statement , statements ))
+
+
+statement
+	: SEMICOLON					()
+	| assignment_statement SEMICOLON			(exp)
+	 
+	
+
+assignment_statement 
+	: ID EQ exp 						(Ast.assign_ (ID , exp )) 
+	
+exp 
+	: ID 								(Ast.id_ ID)
+	| INT 								(Ast.int_ INT)
+	| exp PLUS exp 						(Ast.exp_(PLUS , exp1 ,exp2))
+	| exp MINUS exp 					(Ast.exp_(MINUS , exp1 ,exp2))
+	| exp TIMES exp 					(Ast.exp_(TIMES , exp1 ,exp2))
+	| exp DIVIDE exp 					(Ast.exp_(DIVIDE , exp1 ,exp2))
+	| exp MOD exp 						(Ast.exp_(MOD , exp1 ,exp2))
