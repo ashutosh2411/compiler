@@ -7,13 +7,20 @@
   | COMMA | COLON | SEMICOLON | LPAREN | RPAREN   
   | LBRACE | RBRACE  
   | PLUS | MINUS | TIMES | DIVIDE | MOD | EQ | NEQ | LT | LE | GT | GE |EEQ
-
+  | AND | OR | ASSIGN
+  | IF | THEN | ELSE | WHILE | FOR   
+  | BREAK  
+  | true | false
+ 
 %nonterm 
 			start
 		|	statements
 		|	statement
 		|	assignment_statement
 		|	exp
+		|	selection_statement
+		|	iteration_statement
+		|	bool_expression
 
 
 (* Precedence Directives *)
@@ -33,14 +40,19 @@
 %%
 (*grammer rules*)
 
+start 
+	: statements 							(statements)
+
 statements 
 	: statement  						( statement )
-   	| statement statements			( Ast.statements_(statement , statements ))
+	| statement statements			( Ast.statements_(statement , statements ))
 
 
 statement
 	: SEMICOLON					()
 	| assignment_statement SEMICOLON			(exp)
+	| selection_statement				(selection_statement)
+	| iteration_statement 				(iteration_statement)
 	 
 	
 
@@ -55,3 +67,16 @@ exp
 	| exp TIMES exp 					(Ast.exp_(TIMES , exp1 ,exp2))
 	| exp DIVIDE exp 					(Ast.exp_(DIVIDE , exp1 ,exp2))
 	| exp MOD exp 						(Ast.exp_(MOD , exp1 ,exp2))
+	
+
+selection_statement
+	: IF LPAREN bool_expression RPAREN LBRACE statements RBRACE 			     (Ast.ifonly_(bool_expression , statements))
+
+iteration_statement
+	: FOR LPAREN assignment_statement SEMICOLON bool_expression SEMICOLON assignment_statement RPAREN LBRACE statements RBRACE  (Ast.forloop_(assignment_statement , bool_expression ,assignment_statement , statements))	
+
+bool_expression
+	: true  							(Ast.bool_(true))
+	| false 							(Ast.bool_(false))
+
+	
