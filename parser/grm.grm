@@ -70,13 +70,25 @@ exp
 	
 
 selection_statement
-	: IF LPAREN bool_expression RPAREN LBRACE statements RBRACE 			     (Ast.ifonly_(bool_expression , statements))
+	: IF LPAREN bool_expression RPAREN  statement    			     (Ast.ifonly_(bool_expression , statement))
+	| IF LPAREN bool_expression RPAREN LBRACE statements RBRACE 			     (Ast.ifonly_(bool_expression , statements))
+	| IF LPAREN bool_expression RPAREN  statement  ELSE  statement  		(Ast.ifelse_(bool_expression , statement1 , statement2))
+	| IF LPAREN bool_expression RPAREN LBRACE statements RBRACE ELSE LBRACE statements RBRACE  (Ast.ifelse_(bool_expression , statements1 , statements2))
+	 
 
 iteration_statement
-	: FOR LPAREN assignment_statement SEMICOLON bool_expression SEMICOLON assignment_statement RPAREN LBRACE statements RBRACE  (Ast.forloop_(assignment_statement , bool_expression ,assignment_statement , statements))	
+	: FOR LPAREN assignment_statement SEMICOLON bool_expression SEMICOLON assignment_statement RPAREN LBRACE statements RBRACE  (Ast.forloop_(assignment_statement , bool_expression ,assignment_statement , statements))
+	(* | WHILE LPAREN bool_expression RPAREN LBRACE statements RBRACE    				(Ast.whileloop_(bool_expression , statements)) *)
+	
 
 bool_expression
-	: true  							(Ast.bool_(true))
+	: exp EEQ exp     					(Ast.boolexp_( EEQ ,exp1 ,exp2))
+	| exp NEQ exp 						(Ast.boolexp_( NEQ ,exp1 ,exp2))
+	| exp GE exp 						(Ast.boolexp_( GE ,exp1 ,exp2))
+	| exp GT exp 						(Ast.boolexp_( GT ,exp1 ,exp2))
+	| exp LT exp 						(Ast.boolexp_( LT ,exp1 ,exp2))
+	| exp LE exp 						(Ast.boolexp_( LE ,exp1 ,exp2))
+	| true  							(Ast.bool_(true))
 	| false 							(Ast.bool_(false))
 
 	
