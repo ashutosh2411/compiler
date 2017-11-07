@@ -1,94 +1,95 @@
+
+
 %%
 
 %term
     EOF 
   | ID of string
-  | INT of int  
-  | COMMA | COLON | SEMICOLON | LPAREN | RPAREN   
+  | INT of int
+  | COMMA | SEMICOLON | LPAREN | RPAREN   
   | LBRACE | RBRACE  
-  | PLUS | MINUS | TIMES | DIVIDE | MOD | EQ | NEQ | LT | LE | GT | GE |EEQ
-  | AND | OR | ASSIGN
-  | IF | THEN | ELSE | WHILE | FOR   
+  | PLUS | MINUS | TIMES | DIVIDE | MOD   | NEQ | LT | LE | GT | GE |EEQ
+  |   EQ
+  | IF |   ELSE | WHILE | FOR   
   | BREAK  
-  | true | false
+  | TRUE | FALSE
+  | PRINTF 
  
 %nonterm 
-			start
-		|	statements
-		|	statement
-		|	assignment_statement
-		|	exp
-		|	selection_statement
-		|	iteration_statement
-		|	bool_expression
+			start  of Ast.li
+		|	statements   of Ast.statement list
+		|	statement 		of Ast.statement
+		|	assignment_statement of Ast.statement
+		|	exp of Ast.exp
+		|	selection_statement  of Ast.statement
+		|	iteration_statement of Ast.statement
+		|	bool_expression  of Ast.boolexp
 
 
 (* Precedence Directives *)
 %right      ELSE                                      (* Binding - Loose *)
-%left       OR                                        (* | *)
-%left       AND                                       (* | *)
-%nonassoc   EQ NEQ LT LE GT GE                        (* | *)
+%nonassoc   NEQ LT LE GT GE                        (* | *)
 %left       PLUS MINUS                                (* \/ *)
 %left       TIMES DIVIDE  MOD                         (* Binding - Tight *)
 
+%verbose
 %pos int 
 %start start
 %eop EOF
 %noshift EOF
-
+%name C
 
 %%
 (*grammer rules*)
-
 start 
-	: statements 							(statements)
+	: statements 							( statements )
 
 statements 
-	: statement  						( statement )
-	| statement statements			( Ast.statements_(statement , statements ))
+	: statement  						( [statement] )
+	| statement SEMICOLON statements			(  statement :: statements  )
 
 
 statement
-	: SEMICOLON					()
-	| assignment_statement SEMICOLON			(exp)
+	: assignment_statement  SEMICOLON	(assignment_statement)
 	| selection_statement				(selection_statement)
 	| iteration_statement 				(iteration_statement)
 	 
 	
 
 assignment_statement 
-	: ID EQ exp 						(Ast.assign_ (ID , exp )) 
+	: ID EQ exp 						(Ast.stmt(Ast.assign_ (Ast.id_(ID) , exp )) )
 	
 exp 
-	: ID 								(Ast.id_ ID)
-	| INT 								(Ast.int_ INT)
-	| exp PLUS exp 						(Ast.exp_(PLUS , exp1 ,exp2))
-	| exp MINUS exp 					(Ast.exp_(MINUS , exp1 ,exp2))
-	| exp TIMES exp 					(Ast.exp_(TIMES , exp1 ,exp2))
-	| exp DIVIDE exp 					(Ast.exp_(DIVIDE , exp1 ,exp2))
-	| exp MOD exp 						(Ast.exp_(MOD , exp1 ,exp2))
+	: ID 								( Ast.id1_(ID)  )
+	| INT 								( Ast.int1_(INT) )
+	| exp PLUS exp 						(Ast.exp_(Ast.Plus , exp1 ,exp2))
+	| exp MINUS exp 					(Ast.exp_(Ast.Minus , exp1 ,exp2))
+	| exp TIMES exp 					(Ast.exp_(Ast.Times , exp1 ,exp2))
+	| exp DIVIDE exp 					(Ast.exp_(Ast.Divide , exp1 ,exp2))
+	| exp MOD exp 						(Ast.exp_(Ast.Mod , exp1 ,exp2))
 	
 
+
 selection_statement
-	: IF LPAREN bool_expression RPAREN  statement    			     (Ast.ifonly_(bool_expression , statement))
-	| IF LPAREN bool_expression RPAREN LBRACE statements RBRACE 			     (Ast.ifonly_(bool_expression , statements))
-	| IF LPAREN bool_expression RPAREN  statement  ELSE  statement  		(Ast.ifelse_(bool_expression , statement1 , statement2))
-	| IF LPAREN bool_expression RPAREN LBRACE statements RBRACE ELSE LBRACE statements RBRACE  (Ast.ifelse_(bool_expression , statements1 , statements2))
+	 
+	: IF LPAREN bool_expression RPAREN LBRACE statements RBRACE 			     (Ast.ifonlystmt(Ast.ifonly_(bool_expression , statements)))
+	| IF LPAREN bool_expression RPAREN LBRACE statements RBRACE ELSE LBRACE statements RBRACE  (Ast.ifelsestmt(Ast.ifelse_(bool_expression , statements1 , statements2)))
 	 
 
 iteration_statement
-	: FOR LPAREN assignment_statement SEMICOLON bool_expression SEMICOLON assignment_statement RPAREN LBRACE statements RBRACE  (Ast.forloop_(assignment_statement , bool_expression ,assignment_statement , statements))
-	(* | WHILE LPAREN bool_expression RPAREN LBRACE statements RBRACE    				(Ast.whileloop_(bool_expression , statements)) *)
+	: FOR LPAREN assignment_statement SEMICOLON bool_expression SEMICOLON assignment_statement RPAREN LBRACE statements RBRACE  (Ast.floop(Ast.forloop_(assignment_statement1 , bool_expression ,assignment_statement2 , statements)))
+(*
+	 | WHILE LPAREN bool_expression RPAREN LBRACE statements RBRACE    				((Ast.wloop(Ast.whileloop_(bool_expression , statements)) *)
 	
 
 bool_expression
-	: exp EEQ exp     					(Ast.boolexp_( EEQ ,exp1 ,exp2))
-	| exp NEQ exp 						(Ast.boolexp_( NEQ ,exp1 ,exp2))
-	| exp GE exp 						(Ast.boolexp_( GE ,exp1 ,exp2))
-	| exp GT exp 						(Ast.boolexp_( GT ,exp1 ,exp2))
-	| exp LT exp 						(Ast.boolexp_( LT ,exp1 ,exp2))
-	| exp LE exp 						(Ast.boolexp_( LE ,exp1 ,exp2))
-	| true  							(Ast.bool_(true))
-	| false 							(Ast.bool_(false))
+	: exp EEQ exp     					(Ast.boolexp_( Ast.EEQ ,exp1 ,exp2))
+	| exp NEQ exp 						(Ast.boolexp_( Ast.NEQ ,exp1 ,exp2))
+	| exp GE exp 						(Ast.boolexp_( Ast.GE ,exp1 ,exp2))
+	| exp GT exp 						(Ast.boolexp_( Ast.GT ,exp1 ,exp2))
+	| exp LT exp 						(Ast.boolexp_( Ast.LT ,exp1 ,exp2))
+	| exp LE exp 						(Ast.boolexp_( Ast.LE ,exp1 ,exp2))
+
 
 	
+

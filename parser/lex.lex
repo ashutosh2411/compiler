@@ -12,6 +12,7 @@ fun err(p1,p2) = ErrorMsg.error p1
 fun eof() = let val pos = hd(!linePos) in Tokens.EOF(pos,pos) end
 
 %%
+%header (functor CLexFun(structure Tokens: C_TOKENS));
 
 alpha =[a-zA-Z] ;
 digit =[0-9] ;
@@ -27,19 +28,20 @@ whitespace=[\t\ ]+;
 "if"						=>		(Tokens.IF(yypos,yypos+2));
 "else"						=>		(Tokens.ELSE(yypos,yypos+4));
 "printf"  					=>		(Tokens.PRINTF(yypos,yypos+6));
+["true""True"]  			=>		(Tokens.TRUE(yypos,yypos+4));
+["false""False"]  			=>		(Tokens.FALSE(yypos,yypos+5));
+"break"						=>		(Tokens.BREAK(yypos,yypos+5));
  
 {digit}+                 	=>		(Tokens.INT(valOf(Int.fromString yytext),yypos,yypos+size yytext));
 
 {alpha}({alpha}|{digit})* 	=>		(Tokens.ID(yytext,yypos,yypos+size(yytext)));
 "<="			    		=>		(Tokens.LE(yypos,yypos+2));
 ">="    					=>		(Tokens.GE(yypos,yypos+2));
-"=="			    		=>		(Tokens.EQ(yypos,yypos+2));
-"!="			    		=>		(Tokens.NE(yypos,yypos+2));
+"=="			    		=>		(Tokens.EEQ(yypos,yypos+2));
+"!="			    		=>		(Tokens.NEQ(yypos,yypos+2));
 ">"							=>		(Tokens.GT(yypos,yypos+1));
 "<"							=>		(Tokens.LT(yypos,yypos+1));
-"="							=>		(Tokens.ASSIGN(yypos,yypos+1));
-"||"						=>		(Tokens.OR(yypos,yypos+2));			
-"&&"						=>		(Tokens.AND(yypos,yypos+2));	
+"="							=>		(Tokens.EQ(yypos,yypos+1));	
 "("							=>		(Tokens.LPAREN(yypos,yypos+1));
 ")"							=>		(Tokens.RPAREN(yypos,yypos+1));
 "{"							=>		(Tokens.LBRACE(yypos,yypos+1));
@@ -51,6 +53,7 @@ whitespace=[\t\ ]+;
 "-"							=>		(Tokens.MINUS(yypos,yypos+1));
 "/"							=>		(Tokens.DIVIDE(yypos,yypos+1));
 "*"							=>		(Tokens.TIMES(yypos,yypos+1));
-
+"%"							=>		(Tokens.MOD(yypos,yypos+1));
 
 .       					=> (ErrorMsg.error yypos ("illegal character:" ^ "|" ^ yytext ^ "|"); continue());
+

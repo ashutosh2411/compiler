@@ -4,7 +4,11 @@ lex.lex
 Ast.sml
 parse.sml
 errormsg.sml
-grm.grm : shell (target: grm.grm ml-yacc %s)
+grm.grm.sig
+grm.grm : shell (target: grm.grm.sml ml-yacc %s)
+
 $/smlnj-lib.cm
 $/ml-yacc-lib.cm
 $/basis.cm
+
+ 
