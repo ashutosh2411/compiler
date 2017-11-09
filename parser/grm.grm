@@ -46,7 +46,7 @@ start
 
 statements 
 	: statement  						( [statement] )
-	| statement SEMICOLON statements			(  statement :: statements  )
+	| statement  statements			(  statement :: statements  )
 
 
 statement
@@ -89,7 +89,3 @@ bool_expression
 	| exp GT exp 						(Ast.boolexp_( Ast.GT ,exp1 ,exp2))
 	| exp LT exp 						(Ast.boolexp_( Ast.LT ,exp1 ,exp2))
 	| exp LE exp 						(Ast.boolexp_( Ast.LE ,exp1 ,exp2))
-
-
-	
-

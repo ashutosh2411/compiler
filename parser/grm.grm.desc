@@ -7,7 +7,7 @@ state 0:
 	IF	shift 7
 	FOR	shift 6
 
-	start	goto 59
+	start	goto 58
 	statements	goto 5
 	statement	goto 4
 	assignment_statement	goto 3
@@ -48,10 +48,17 @@ state 3:
 state 4:
 
 	statements : statement .  (reduce by rule 1)
-	statements : statement . SEMICOLON statements 
+	statements : statement . statements 
 
-	SEMICOLON	shift 10
+	ID	shift 8
+	IF	shift 7
+	FOR	shift 6
 
+	statements	goto 10
+	statement	goto 4
+	assignment_statement	goto 3
+	selection_statement	goto 2
+	iteration_statement	goto 1
 
 	.	reduce by rule 1
 
@@ -107,19 +114,11 @@ state 9:
 
 state 10:
 
-	statements : statement SEMICOLON . statements 
+	statements : statement statements .  (reduce by rule 2)
 
-	ID	shift 8
-	IF	shift 7
-	FOR	shift 6
 
-	statements	goto 14
-	statement	goto 4
-	assignment_statement	goto 3
-	selection_statement	goto 2
-	iteration_statement	goto 1
 
-	.	error
+	.	reduce by rule 2
 
 
 state 11:
@@ -128,7 +127,7 @@ state 11:
 
 	ID	shift 8
 
-	assignment_statement	goto 15
+	assignment_statement	goto 14
 
 	.	error
 
@@ -138,11 +137,11 @@ state 12:
 	selection_statement : IF LPAREN . bool_expression RPAREN LBRACE statements RBRACE 
 	selection_statement : IF LPAREN . bool_expression RPAREN LBRACE statements RBRACE ELSE LBRACE statements RBRACE 
 
-	ID	shift 19
-	INT	shift 18
+	ID	shift 18
+	INT	shift 17
 
-	exp	goto 17
-	bool_expression	goto 16
+	exp	goto 16
+	bool_expression	goto 15
 
 	.	error
 
@@ -151,45 +150,36 @@ state 13:
 
 	assignment_statement : ID EQ . exp 
 
-	ID	shift 19
-	INT	shift 18
+	ID	shift 18
+	INT	shift 17
 
-	exp	goto 20
+	exp	goto 19
 
 	.	error
 
 
 state 14:
 
-	statements : statement SEMICOLON statements .  (reduce by rule 2)
+	iteration_statement : FOR LPAREN assignment_statement . SEMICOLON bool_expression SEMICOLON assignment_statement RPAREN LBRACE statements RBRACE 
+
+	SEMICOLON	shift 20
 
 
-
-	.	reduce by rule 2
+	.	error
 
 
 state 15:
 
-	iteration_statement : FOR LPAREN assignment_statement . SEMICOLON bool_expression SEMICOLON assignment_statement RPAREN LBRACE statements RBRACE 
+	selection_statement : IF LPAREN bool_expression . RPAREN LBRACE statements RBRACE 
+	selection_statement : IF LPAREN bool_expression . RPAREN LBRACE statements RBRACE ELSE LBRACE statements RBRACE 
 
-	SEMICOLON	shift 21
+	RPAREN	shift 21
 
 
 	.	error
 
 
 state 16:
-
-	selection_statement : IF LPAREN bool_expression . RPAREN LBRACE statements RBRACE 
-	selection_statement : IF LPAREN bool_expression . RPAREN LBRACE statements RBRACE ELSE LBRACE statements RBRACE 
-
-	RPAREN	shift 22
-
-
-	.	error
-
-
-state 17:
 
 	exp : exp . PLUS exp 
 	exp : exp . MINUS exp 
@@ -203,23 +193,23 @@ state 17:
 	bool_expression : exp . LT exp 
 	bool_expression : exp . LE exp 
 
-	PLUS	shift 33
-	MINUS	shift 32
-	TIMES	shift 31
-	DIVIDE	shift 30
-	MOD	shift 29
-	NEQ	shift 28
-	LT	shift 27
-	LE	shift 26
-	GT	shift 25
-	GE	shift 24
-	EEQ	shift 23
+	PLUS	shift 32
+	MINUS	shift 31
+	TIMES	shift 30
+	DIVIDE	shift 29
+	MOD	shift 28
+	NEQ	shift 27
+	LT	shift 26
+	LE	shift 25
+	GT	shift 24
+	GE	shift 23
+	EEQ	shift 22
 
 
 	.	error
 
 
-state 18:
+state 17:
 
 	exp : INT .  (reduce by rule 8)
 
@@ -228,7 +218,7 @@ state 18:
 	.	reduce by rule 8
 
 
-state 19:
+state 18:
 
 	exp : ID .  (reduce by rule 7)
 
@@ -237,7 +227,7 @@ state 19:
 	.	reduce by rule 7
 
 
-state 20:
+state 19:
 
 	assignment_statement : ID EQ exp .  (reduce by rule 6)
 	exp : exp . PLUS exp 
@@ -246,46 +236,58 @@ state 20:
 	exp : exp . DIVIDE exp 
 	exp : exp . MOD exp 
 
-	PLUS	shift 33
-	MINUS	shift 32
-	TIMES	shift 31
-	DIVIDE	shift 30
-	MOD	shift 29
+	PLUS	shift 32
+	MINUS	shift 31
+	TIMES	shift 30
+	DIVIDE	shift 29
+	MOD	shift 28
 
 
 	.	reduce by rule 6
 
 
-state 21:
+state 20:
 
 	iteration_statement : FOR LPAREN assignment_statement SEMICOLON . bool_expression SEMICOLON assignment_statement RPAREN LBRACE statements RBRACE 
 
-	ID	shift 19
-	INT	shift 18
+	ID	shift 18
+	INT	shift 17
 
-	exp	goto 17
-	bool_expression	goto 34
+	exp	goto 16
+	bool_expression	goto 33
+
+	.	error
+
+
+state 21:
+
+	selection_statement : IF LPAREN bool_expression RPAREN . LBRACE statements RBRACE 
+	selection_statement : IF LPAREN bool_expression RPAREN . LBRACE statements RBRACE ELSE LBRACE statements RBRACE 
+
+	LBRACE	shift 34
+
 
 	.	error
 
 
 state 22:
 
-	selection_statement : IF LPAREN bool_expression RPAREN . LBRACE statements RBRACE 
-	selection_statement : IF LPAREN bool_expression RPAREN . LBRACE statements RBRACE ELSE LBRACE statements RBRACE 
+	bool_expression : exp EEQ . exp 
 
-	LBRACE	shift 35
+	ID	shift 18
+	INT	shift 17
 
+	exp	goto 35
 
 	.	error
 
 
 state 23:
 
-	bool_expression : exp EEQ . exp 
+	bool_expression : exp GE . exp 
 
-	ID	shift 19
-	INT	shift 18
+	ID	shift 18
+	INT	shift 17
 
 	exp	goto 36
 
@@ -294,10 +296,10 @@ state 23:
 
 state 24:
 
-	bool_expression : exp GE . exp 
+	bool_expression : exp GT . exp 
 
-	ID	shift 19
-	INT	shift 18
+	ID	shift 18
+	INT	shift 17
 
 	exp	goto 37
 
@@ -306,10 +308,10 @@ state 24:
 
 state 25:
 
-	bool_expression : exp GT . exp 
+	bool_expression : exp LE . exp 
 
-	ID	shift 19
-	INT	shift 18
+	ID	shift 18
+	INT	shift 17
 
 	exp	goto 38
 
@@ -318,10 +320,10 @@ state 25:
 
 state 26:
 
-	bool_expression : exp LE . exp 
+	bool_expression : exp LT . exp 
 
-	ID	shift 19
-	INT	shift 18
+	ID	shift 18
+	INT	shift 17
 
 	exp	goto 39
 
@@ -330,10 +332,10 @@ state 26:
 
 state 27:
 
-	bool_expression : exp LT . exp 
+	bool_expression : exp NEQ . exp 
 
-	ID	shift 19
-	INT	shift 18
+	ID	shift 18
+	INT	shift 17
 
 	exp	goto 40
 
@@ -342,10 +344,10 @@ state 27:
 
 state 28:
 
-	bool_expression : exp NEQ . exp 
+	exp : exp MOD . exp 
 
-	ID	shift 19
-	INT	shift 18
+	ID	shift 18
+	INT	shift 17
 
 	exp	goto 41
 
@@ -354,10 +356,10 @@ state 28:
 
 state 29:
 
-	exp : exp MOD . exp 
+	exp : exp DIVIDE . exp 
 
-	ID	shift 19
-	INT	shift 18
+	ID	shift 18
+	INT	shift 17
 
 	exp	goto 42
 
@@ -366,10 +368,10 @@ state 29:
 
 state 30:
 
-	exp : exp DIVIDE . exp 
+	exp : exp TIMES . exp 
 
-	ID	shift 19
-	INT	shift 18
+	ID	shift 18
+	INT	shift 17
 
 	exp	goto 43
 
@@ -378,10 +380,10 @@ state 30:
 
 state 31:
 
-	exp : exp TIMES . exp 
+	exp : exp MINUS . exp 
 
-	ID	shift 19
-	INT	shift 18
+	ID	shift 18
+	INT	shift 17
 
 	exp	goto 44
 
@@ -390,10 +392,10 @@ state 31:
 
 state 32:
 
-	exp : exp MINUS . exp 
+	exp : exp PLUS . exp 
 
-	ID	shift 19
-	INT	shift 18
+	ID	shift 18
+	INT	shift 17
 
 	exp	goto 45
 
@@ -402,27 +404,15 @@ state 32:
 
 state 33:
 
-	exp : exp PLUS . exp 
+	iteration_statement : FOR LPAREN assignment_statement SEMICOLON bool_expression . SEMICOLON assignment_statement RPAREN LBRACE statements RBRACE 
 
-	ID	shift 19
-	INT	shift 18
+	SEMICOLON	shift 46
 
-	exp	goto 46
 
 	.	error
 
 
 state 34:
-
-	iteration_statement : FOR LPAREN assignment_statement SEMICOLON bool_expression . SEMICOLON assignment_statement RPAREN LBRACE statements RBRACE 
-
-	SEMICOLON	shift 47
-
-
-	.	error
-
-
-state 35:
 
 	selection_statement : IF LPAREN bool_expression RPAREN LBRACE . statements RBRACE 
 	selection_statement : IF LPAREN bool_expression RPAREN LBRACE . statements RBRACE ELSE LBRACE statements RBRACE 
@@ -431,13 +421,32 @@ state 35:
 	IF	shift 7
 	FOR	shift 6
 
-	statements	goto 48
+	statements	goto 47
 	statement	goto 4
 	assignment_statement	goto 3
 	selection_statement	goto 2
 	iteration_statement	goto 1
 
 	.	error
+
+
+state 35:
+
+	exp : exp . PLUS exp 
+	exp : exp . MINUS exp 
+	exp : exp . TIMES exp 
+	exp : exp . DIVIDE exp 
+	exp : exp . MOD exp 
+	bool_expression : exp EEQ exp .  (reduce by rule 17)
+
+	PLUS	shift 32
+	MINUS	shift 31
+	TIMES	shift 30
+	DIVIDE	shift 29
+	MOD	shift 28
+
+
+	.	reduce by rule 17
 
 
 state 36:
@@ -447,16 +456,16 @@ state 36:
 	exp : exp . TIMES exp 
 	exp : exp . DIVIDE exp 
 	exp : exp . MOD exp 
-	bool_expression : exp EEQ exp .  (reduce by rule 17)
+	bool_expression : exp GE exp .  (reduce by rule 19)
 
-	PLUS	shift 33
-	MINUS	shift 32
-	TIMES	shift 31
-	DIVIDE	shift 30
-	MOD	shift 29
+	PLUS	shift 32
+	MINUS	shift 31
+	TIMES	shift 30
+	DIVIDE	shift 29
+	MOD	shift 28
 
 
-	.	reduce by rule 17
+	.	reduce by rule 19
 
 
 state 37:
@@ -466,16 +475,16 @@ state 37:
 	exp : exp . TIMES exp 
 	exp : exp . DIVIDE exp 
 	exp : exp . MOD exp 
-	bool_expression : exp GE exp .  (reduce by rule 19)
+	bool_expression : exp GT exp .  (reduce by rule 20)
 
-	PLUS	shift 33
-	MINUS	shift 32
-	TIMES	shift 31
-	DIVIDE	shift 30
-	MOD	shift 29
+	PLUS	shift 32
+	MINUS	shift 31
+	TIMES	shift 30
+	DIVIDE	shift 29
+	MOD	shift 28
 
 
-	.	reduce by rule 19
+	.	reduce by rule 20
 
 
 state 38:
@@ -485,16 +494,16 @@ state 38:
 	exp : exp . TIMES exp 
 	exp : exp . DIVIDE exp 
 	exp : exp . MOD exp 
-	bool_expression : exp GT exp .  (reduce by rule 20)
+	bool_expression : exp LE exp .  (reduce by rule 22)
 
-	PLUS	shift 33
-	MINUS	shift 32
-	TIMES	shift 31
-	DIVIDE	shift 30
-	MOD	shift 29
+	PLUS	shift 32
+	MINUS	shift 31
+	TIMES	shift 30
+	DIVIDE	shift 29
+	MOD	shift 28
 
 
-	.	reduce by rule 20
+	.	reduce by rule 22
 
 
 state 39:
@@ -504,16 +513,16 @@ state 39:
 	exp : exp . TIMES exp 
 	exp : exp . DIVIDE exp 
 	exp : exp . MOD exp 
-	bool_expression : exp LE exp .  (reduce by rule 22)
+	bool_expression : exp LT exp .  (reduce by rule 21)
 
-	PLUS	shift 33
-	MINUS	shift 32
-	TIMES	shift 31
-	DIVIDE	shift 30
-	MOD	shift 29
+	PLUS	shift 32
+	MINUS	shift 31
+	TIMES	shift 30
+	DIVIDE	shift 29
+	MOD	shift 28
 
 
-	.	reduce by rule 22
+	.	reduce by rule 21
 
 
 state 40:
@@ -523,38 +532,19 @@ state 40:
 	exp : exp . TIMES exp 
 	exp : exp . DIVIDE exp 
 	exp : exp . MOD exp 
-	bool_expression : exp LT exp .  (reduce by rule 21)
-
-	PLUS	shift 33
-	MINUS	shift 32
-	TIMES	shift 31
-	DIVIDE	shift 30
-	MOD	shift 29
-
-
-	.	reduce by rule 21
-
-
-state 41:
-
-	exp : exp . PLUS exp 
-	exp : exp . MINUS exp 
-	exp : exp . TIMES exp 
-	exp : exp . DIVIDE exp 
-	exp : exp . MOD exp 
 	bool_expression : exp NEQ exp .  (reduce by rule 18)
 
-	PLUS	shift 33
-	MINUS	shift 32
-	TIMES	shift 31
-	DIVIDE	shift 30
-	MOD	shift 29
+	PLUS	shift 32
+	MINUS	shift 31
+	TIMES	shift 30
+	DIVIDE	shift 29
+	MOD	shift 28
 
 
 	.	reduce by rule 18
 
 
-state 42:
+state 41:
 
 	exp : exp . PLUS exp 
 	exp : exp . MINUS exp 
@@ -568,7 +558,7 @@ state 42:
 	.	reduce by rule 13
 
 
-state 43:
+state 42:
 
 	exp : exp . PLUS exp 
 	exp : exp . MINUS exp 
@@ -582,7 +572,7 @@ state 43:
 	.	reduce by rule 12
 
 
-state 44:
+state 43:
 
 	exp : exp . PLUS exp 
 	exp : exp . MINUS exp 
@@ -596,7 +586,7 @@ state 44:
 	.	reduce by rule 11
 
 
-state 45:
+state 44:
 
 	exp : exp . PLUS exp 
 	exp : exp . MINUS exp 
@@ -605,15 +595,15 @@ state 45:
 	exp : exp . DIVIDE exp 
 	exp : exp . MOD exp 
 
-	TIMES	shift 31
-	DIVIDE	shift 30
-	MOD	shift 29
+	TIMES	shift 30
+	DIVIDE	shift 29
+	MOD	shift 28
 
 
 	.	reduce by rule 10
 
 
-state 46:
+state 45:
 
 	exp : exp . PLUS exp 
 	exp : exp PLUS exp .  (reduce by rule 9)
@@ -622,31 +612,41 @@ state 46:
 	exp : exp . DIVIDE exp 
 	exp : exp . MOD exp 
 
-	TIMES	shift 31
-	DIVIDE	shift 30
-	MOD	shift 29
+	TIMES	shift 30
+	DIVIDE	shift 29
+	MOD	shift 28
 
 
 	.	reduce by rule 9
 
 
-state 47:
+state 46:
 
 	iteration_statement : FOR LPAREN assignment_statement SEMICOLON bool_expression SEMICOLON . assignment_statement RPAREN LBRACE statements RBRACE 
 
 	ID	shift 8
 
-	assignment_statement	goto 49
+	assignment_statement	goto 48
+
+	.	error
+
+
+state 47:
+
+	selection_statement : IF LPAREN bool_expression RPAREN LBRACE statements . RBRACE 
+	selection_statement : IF LPAREN bool_expression RPAREN LBRACE statements . RBRACE ELSE LBRACE statements RBRACE 
+
+	RBRACE	shift 49
+
 
 	.	error
 
 
 state 48:
 
-	selection_statement : IF LPAREN bool_expression RPAREN LBRACE statements . RBRACE 
-	selection_statement : IF LPAREN bool_expression RPAREN LBRACE statements . RBRACE ELSE LBRACE statements RBRACE 
+	iteration_statement : FOR LPAREN assignment_statement SEMICOLON bool_expression SEMICOLON assignment_statement . RPAREN LBRACE statements RBRACE 
 
-	RBRACE	shift 50
+	RPAREN	shift 50
 
 
 	.	error
@@ -654,28 +654,28 @@ state 48:
 
 state 49:
 
-	iteration_statement : FOR LPAREN assignment_statement SEMICOLON bool_expression SEMICOLON assignment_statement . RPAREN LBRACE statements RBRACE 
-
-	RPAREN	shift 51
-
-
-	.	error
-
-
-state 50:
-
 	selection_statement : IF LPAREN bool_expression RPAREN LBRACE statements RBRACE .  (reduce by rule 14)
 	selection_statement : IF LPAREN bool_expression RPAREN LBRACE statements RBRACE . ELSE LBRACE statements RBRACE 
 
-	ELSE	shift 52
+	ELSE	shift 51
 
 
 	.	reduce by rule 14
 
 
-state 51:
+state 50:
 
 	iteration_statement : FOR LPAREN assignment_statement SEMICOLON bool_expression SEMICOLON assignment_statement RPAREN . LBRACE statements RBRACE 
+
+	LBRACE	shift 52
+
+
+	.	error
+
+
+state 51:
+
+	selection_statement : IF LPAREN bool_expression RPAREN LBRACE statements RBRACE ELSE . LBRACE statements RBRACE 
 
 	LBRACE	shift 53
 
@@ -685,17 +685,24 @@ state 51:
 
 state 52:
 
-	selection_statement : IF LPAREN bool_expression RPAREN LBRACE statements RBRACE ELSE . LBRACE statements RBRACE 
+	iteration_statement : FOR LPAREN assignment_statement SEMICOLON bool_expression SEMICOLON assignment_statement RPAREN LBRACE . statements RBRACE 
 
-	LBRACE	shift 54
+	ID	shift 8
+	IF	shift 7
+	FOR	shift 6
 
+	statements	goto 54
+	statement	goto 4
+	assignment_statement	goto 3
+	selection_statement	goto 2
+	iteration_statement	goto 1
 
 	.	error
 
 
 state 53:
 
-	iteration_statement : FOR LPAREN assignment_statement SEMICOLON bool_expression SEMICOLON assignment_statement RPAREN LBRACE . statements RBRACE 
+	selection_statement : IF LPAREN bool_expression RPAREN LBRACE statements RBRACE ELSE LBRACE . statements RBRACE 
 
 	ID	shift 8
 	IF	shift 7
@@ -712,24 +719,17 @@ state 53:
 
 state 54:
 
-	selection_statement : IF LPAREN bool_expression RPAREN LBRACE statements RBRACE ELSE LBRACE . statements RBRACE 
+	iteration_statement : FOR LPAREN assignment_statement SEMICOLON bool_expression SEMICOLON assignment_statement RPAREN LBRACE statements . RBRACE 
 
-	ID	shift 8
-	IF	shift 7
-	FOR	shift 6
+	RBRACE	shift 56
 
-	statements	goto 56
-	statement	goto 4
-	assignment_statement	goto 3
-	selection_statement	goto 2
-	iteration_statement	goto 1
 
 	.	error
 
 
 state 55:
 
-	iteration_statement : FOR LPAREN assignment_statement SEMICOLON bool_expression SEMICOLON assignment_statement RPAREN LBRACE statements . RBRACE 
+	selection_statement : IF LPAREN bool_expression RPAREN LBRACE statements RBRACE ELSE LBRACE statements . RBRACE 
 
 	RBRACE	shift 57
 
@@ -739,16 +739,6 @@ state 55:
 
 state 56:
 
-	selection_statement : IF LPAREN bool_expression RPAREN LBRACE statements RBRACE ELSE LBRACE statements . RBRACE 
-
-	RBRACE	shift 58
-
-
-	.	error
-
-
-state 57:
-
 	iteration_statement : FOR LPAREN assignment_statement SEMICOLON bool_expression SEMICOLON assignment_statement RPAREN LBRACE statements RBRACE .  (reduce by rule 16)
 
 
@@ -756,7 +746,7 @@ state 57:
 	.	reduce by rule 16
 
 
-state 58:
+state 57:
 
 	selection_statement : IF LPAREN bool_expression RPAREN LBRACE statements RBRACE ELSE LBRACE statements RBRACE .  (reduce by rule 15)
 
@@ -765,7 +755,7 @@ state 58:
 	.	reduce by rule 15
 
 
-state 59:
+state 58:
 
 
 	EOF	accept
@@ -773,5 +763,5 @@ state 59:
 
 	.	error
 
-75 of 174 action table entries left after compaction
+77 of 172 action table entries left after compaction
 44 goto table entries
