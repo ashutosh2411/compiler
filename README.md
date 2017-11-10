@@ -11,17 +11,17 @@ Group_number 11
 
 ## Execution: 
 Navigate to compiler/parser, then execute the following commands. 
-'''
+```
 sml
-'''
+```
 Then in the interpreter, enter the following commands. 
-'''
+```
 CM.make("sources.cm");
 Control.Print.printDepth:=20;
 Control.Print.printLength:=20;
 Control.Print.stringDepth:=20;
 Parser.parse "test.av";
-'''
+```
 
 ## Repositories: 
   - lexer : Phase 1 of the project. Tokenizes the input into a stream of tokens. 
