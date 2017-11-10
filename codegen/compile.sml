@@ -3,7 +3,6 @@ Control.Print.printDepth:=20000;
 Control.Print.printLength:=20000;
 Control.Print.stringDepth:=20000;
 
-val ast = Parser.parse "../parser/test3.av"
 
 fun op1 (Ast.Plus) = "+"
 	|op1 (Ast.Minus) = "-"
@@ -45,5 +44,3 @@ fun stlistToString ([]) 				= " "
 
 
   
-
-val x=stlistToString (ast) ;

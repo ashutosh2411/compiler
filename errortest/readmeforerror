@@ -1,0 +1,10 @@
+error.av  =>> semicolon
+error1.av  =>> for loop syntax error
+error2.av   =>>  variable separated by comma only with no semicolon at end
+error3.av   =>> only expression but not assign to any expression
+
+go to codegen folder and run this for every file 
+it will give error and do something to correct that and give the abstract syntax tree if possible
+
+val ast = Parser.parse "../errortest/error.av"
+
