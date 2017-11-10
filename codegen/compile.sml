@@ -21,7 +21,7 @@ fun expToString (Ast.id1_(x) )= x
  	|expToString (Ast.int1_(x)) = Int.toString(x)
  	|expToString (Ast.exp_(Plus , exp1 ,exp2)) = expToString (exp1 )^" + " ^expToString (exp2 )
  	
-fun boolToString 	
+fun boolToString (Ast.boolexp_(EQ,exp1,exp2)) = expToString(exp1)^" == "^ expToString(exp1)
 
 
 fun assToString (Ast.assign_(Ast.id_(x) ,exp)) = x^" = "^expToString(exp)^";"
