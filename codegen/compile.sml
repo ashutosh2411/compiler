@@ -1,8 +1,11 @@
+CM.make("../parser/sources.cm");
 Control.Print.printDepth:=20;
 Control.Print.printLength:=20;
 Control.Print.stringDepth:=20;
 
-val ast = Parser.parse "test3.c"
+val ast = Parser.parse "../parser/test3.c"
+
+(*
 
 datatype checktype = Plus
 (*
@@ -32,3 +35,5 @@ fun compile [] = ""
 
 				end ;
 
+
+*)
