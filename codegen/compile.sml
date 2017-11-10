@@ -5,6 +5,8 @@ Control.Print.stringDepth:=20;
 
 val ast = Parser.parse "../parser/test3.c"
 
+fun expToString (
+
 (*
 
 datatype checktype = Plus
