@@ -1,7 +1,7 @@
 CM.make("../parser/sources.cm");
-Control.Print.printDepth:=20;
-Control.Print.printLength:=20;
-Control.Print.stringDepth:=20;
+Control.Print.printDepth:=20000;
+Control.Print.printLength:=20000;
+Control.Print.stringDepth:=20000;
 
 val ast = Parser.parse "../parser/test3.av"
 
@@ -31,14 +31,16 @@ fun boolToString (Ast.boolexp_(x,exp1,exp2)) = expToString(exp1)^ boolop(x) ^ ex
 fun assToString (Ast.assign_(Ast.id_(x) ,exp)) = x^" = "^expToString(exp)^";"
 
 fun stlistToString ([]) 				= " "
-	|stlistToString ((Ast.stmt(x))::xs) = (assToString x )^stlistToString (xs)
 
-	|stlistToString ([Ast.floop(x)]) = let 
-		val Ast.forloop_(st1 ,bexp ,st2 ,st3) = x 
+	|stlistToString ((Ast.floop(x))::xs) = let 
+		val Ast.forloop_(Ast.stmt(st1) ,bexp ,Ast.stmt(st2) ,st3) = x 
 		in 
-			assToString(st1)^" ; while ( " ^ boolToString(bexp) ^" ){ " ^stlistToString(st3) ^ assToString(st2) ^ "} "
+			assToString(st1)^" ; while ( " ^ boolToString(bexp) ^" ){ " ^stlistToString(st3) ^ assToString(st2) ^ "} " ^ stlistToString(xs)
 
-		end ;
+		end 
+
+	| stlistToString ((Ast.stmt(x))::xs) = assToString( x) ^ stlistToString (xs)
+
 	
 
 
